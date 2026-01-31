@@ -1,3 +1,11 @@
+# =========================================================
+# Dashboard personalizado
+# Autor: Roberto Molina
+# Asignatura: Programación Orientada a Objetos
+# Descripción:
+# Este dashboard fue adaptado para organizar tareas y
+# proyectos personales de la materia.
+# =========================================================
 import os
 import subprocess
 

@@ -3,10 +3,10 @@ from modelos.producto import Producto
 
 class Inventario:
     """
-    Inventario Mejorado:
-    - Carga productos desde inventario.txt al iniciar
-    - Guarda productos en inventario.txt al agregar/actualizar/eliminar
-    - Manejo de excepciones: FileNotFoundError, PermissionError, OSError, ValueError
+    Inventario con archivo:
+    - Carga desde inventario.txt al iniciar
+    - Guarda en inventario.txt al agregar/actualizar/eliminar
+    - Maneja: FileNotFoundError, PermissionError, ValueError
     """
 
     def __init__(self, archivo="inventario.txt"):
@@ -19,9 +19,7 @@ class Inventario:
     # -----------------------------
     def cargar_desde_archivo(self):
         """
-        Lee inventario.txt (formato: id,nombre,cantidad,precio).
-        Si el archivo no existe, lo crea vacío.
-        Si hay líneas corruptas, las ignora y continúa.
+        Lee inventario.txt (formato: id,nombre,cantidad,precio)
         """
         try:
             with open(self.archivo, "r", encoding="utf-8") as f:
@@ -41,16 +39,13 @@ class Inventario:
                         nombre = partes[1]
                         cantidad = int(partes[2])
                         precio = float(partes[3])
-
-                        producto = Producto(pid, nombre, cantidad, precio)
-                        self.productos.append(producto)
-
+                        self.productos.append(Producto(pid, nombre, cantidad, precio))
                     except ValueError:
                         print(f"⚠ Línea corrupta (datos inválidos) en {num_linea}: {linea}")
                         continue
 
         except FileNotFoundError:
-            # Si el archivo no existe, lo creamos vacío
+            # si no existe, lo crea vacío
             try:
                 with open(self.archivo, "w", encoding="utf-8") as _:
                     pass
@@ -66,19 +61,17 @@ class Inventario:
     # -----------------------------
     def guardar_en_archivo(self):
         """
-        Sobrescribe inventario.txt con el estado actual del inventario.
-        Retorna True si guarda bien, False si falla.
+        Sobrescribe inventario.txt con el inventario actual.
+        Retorna True si guardó, False si falló.
         """
         try:
             with open(self.archivo, "w", encoding="utf-8") as f:
                 for p in self.productos:
                     f.write(f"{p.get_id()},{p.get_nombre()},{p.get_cantidad()},{p.get_precio()}\n")
             return True
-
         except PermissionError:
             print("❌ No tienes permisos para escribir en inventario.txt.")
             return False
-
         except OSError as e:
             print(f"❌ Error del sistema al guardar el archivo: {e}")
             return False
@@ -134,6 +127,13 @@ class Inventario:
         print("❌ No se encontró un producto con ese ID.")
         return False
 
+    def buscar_por_nombre(self, nombre):
+        """
+        Retorna lista de productos cuyo nombre contenga el texto (no distingue mayúsculas).
+        """
+        nombre = nombre.strip().lower()
+        return [p for p in self.productos if nombre in p.get_nombre().lower()]
+
     def listar_productos(self):
         if not self.productos:
             print("📦 Inventario vacío.")
@@ -141,5 +141,8 @@ class Inventario:
 
         print("\n--- INVENTARIO ---")
         for p in self.productos:
-            print(f"ID: {p.get_id()} | Nombre: {p.get_nombre()} | Cantidad: {p.get_cantidad()} | Precio: {p.get_precio()}")
+            print(
+                f"ID: {p.get_id()} | Nombre: {p.get_nombre()} | "
+                f"Cantidad: {p.get_cantidad()} | Precio: {p.get_precio()}"
+            )
         print("------------------\n")
